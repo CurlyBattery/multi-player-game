@@ -98,27 +98,27 @@
                 if(c.clientId === clientId) playerColor = c.color;
             })
 
+
             while(divBoard.firstChild)
-                divBoard.removeChild (divBoard.firstChild)
+                divBoard.removeChild(divBoard.firstChild)
 
             for (let i = 0; i < game.balls; i++){
-
                 const b = document.createElement("button");
                 b.id = "ball" + (i +1);
                 b.tag = i+1
-                b.textContent = i+1
-                b.style.width = "150px"
-                b.style.height = "150px"
-                b.addEventListener("click", e => {
-                    b.style.background = playerColor
+                b.textContent = i+1;
+                b.style.width = "150px";
+                b.style.height = "150px";
+                b.addEventListener('click', e => {
+                    b.style.background = playerColor;
                     const payLoad = {
                         "method": "play",
                         "clientId": clientId,
                         "gameId": gameId,
                         "ballId": b.tag,
                         "color": playerColor
-                    }
-                    ws.send(JSON.stringify(payLoad))
+                    };
+                    ws.send(JSON.stringify(payLoad));
                 })
                 divBoard.appendChild(b);
             }
