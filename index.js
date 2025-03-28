@@ -58,6 +58,9 @@ wsServer.on("request", request => {
                 "color": color
             });
 
+            //start the game
+            if(game.clients.length === 3) updateGameState();
+
             const payLoad = {
                 "method": "join",
                 "game": game
@@ -67,6 +70,20 @@ wsServer.on("request", request => {
             game.clients.forEach(c => {
                 clients[c.clientId].connection.send(JSON.stringify(payLoad))
             })
+        }
+        //a user plays
+        if(result.method === "play") {
+            const gameId = result.gameId;
+            const ballId = result.ballId;
+            const color = result.color;
+            let state = games[gameId].state;
+            if(!state)
+                state = {};
+
+            state[ballId] = color;
+            games[gameId].state = state;
+
+
         }
 
     });
@@ -85,8 +102,25 @@ wsServer.on("request", request => {
         connection.send(JSON.stringify(payLoad))
 });
 
-function S4() {
-    return (((1+Math.random())*0x10000)|0).toString(16).substring();
+function updateGameState() {
+
+    //{"gameId", rgerg}
+    for (const g of Object.keys(games)) {
+        const game = games[g];
+         const payLoad = {
+            "method": "update",
+            "game": game
+        }
+        game.clients.forEach(c => {
+            clients[c.clientId].connection.send(JSON.stringify(payLoad))
+        })
+    }
+
+    setTimeout(updateGameState, 500);
 }
 
-const guid = () => (S4() + S4() + "-" + S4() + "-4" + S4().substring());
+function S4() {
+    return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
+}
+
+const guid = () => (S4() + S4() + "-" + S4() + "-4" + S4().substr(0, 3) + "-" + S4() +S4() + S4()).toLowerCase();
